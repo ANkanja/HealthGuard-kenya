@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}HealthGuard{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% load static %}
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    nav a { margin-right: 1rem; }
+    .container { max-width: 720px; margin: 0 auto; }
+    .card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
+    form p { margin: .5rem 0; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{% url 'home' %}">Home</a>
+    {% if user.is_authenticated %}
+      <span>Hi, {{ user.username }} ({{ user.profile.role|default:'-' }})</span>
+      {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;color:blue;cursor:pointer;">
+            Logout
+          </button>
+        </form>
+      {% endif %}
+
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+  </nav>
+
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

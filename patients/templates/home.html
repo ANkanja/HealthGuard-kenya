@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Home | HealthGuard{% endblock %}
+{% block content %}
+  <h2>Welcome</h2>
+  <div class="card">
+    <p>You are logged in as <strong>{{ request.user.username }}</strong>.</p>
+    <p>Your role: <strong>{{ request.user.profile.role|default:"(not set)" }}</strong></p>
+    <p>This is your home page. Next, we can build role-based dashboards.</p>
+  </div>
+{% endblock %}

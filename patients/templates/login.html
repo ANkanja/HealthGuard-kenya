@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Login | HealthGuard{% endblock %}
+{% block content %}
+<h2>Login</h2>
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+  </form>
+</div>
+<p>No account? <a href="{% url 'register' %}">Register</a></p>
+{% endblock %}
