@@ -1,10 +1,113 @@
 {% extends 'base.html' %}
 {% block title %}Home | HealthGuard{% endblock %}
 {% block content %}
-  <h2>Welcome</h2>
-  <div class="card">
-    <p>You are logged in as <strong>{{ request.user.username }}</strong>.</p>
-    <p>Your role: <strong>{{ request.user.profile.role|default:"(not set)" }}</strong></p>
-    <p>This is your home page. Next, we can build role-based dashboards.</p>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Welcome, {{ request.user.first_name }}</h2>
+  <p class="text-muted">Here’s a summary of your health records.</p>
+
+  <!-- Medical History -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      Medical History
+    </div>
+    <div class="card-body">
+      {% if history %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Condition</th>
+              <th>Date Diagnosed</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in history %}
+              <tr>
+                <td>{{ item.condition }}</td>
+                <td>{{ item.date_diagnosed }}</td>
+                <td>{{ item.notes }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No medical history found.</p>
+      {% endif %}
+    </div>
   </div>
+
+  <!-- Prescriptions -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-success text-white">
+      Prescriptions
+    </div>
+    <div class="card-body">
+      {% if prescriptions %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Medication</th>
+              <th>Dosage</th>
+              <th>Start</th>
+              <th>End</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in prescriptions %}
+              <tr>
+                <td>{{ p.medication }}</td>
+                <td>{{ p.dosage }}</td>
+                <td>{{ p.start_date }}</td>
+                <td>{{ p.end_date|default:"Ongoing" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No prescriptions found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Lab Results -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-info text-white">
+      Lab Results
+    </div>
+    <div class="card-body">
+      {% if labs %}
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Test Name</th>
+              <th>Result</th>
+              <th>Date</th>
+              <th>Report</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lab in labs %}
+              <tr>
+                <td>{{ lab.test_name }}</td>
+                <td>{{ lab.result }}</td>
+                <td>{{ lab.date_taken }}</td>
+                <td>
+                  {% if lab.file %}
+                    <a href="{{ lab.file.url }}" class="btn btn-sm btn-outline-primary">Download</a>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No lab results available.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, MedicalHistory
 
 # Register your models here.
 
@@ -20,3 +20,10 @@ class UserAdmin(BaseUserAdmin):
 # Re-register User admin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+
+@admin.register(MedicalHistory)
+class MedicalHistoryAdmin(admin.ModelAdmin):
+    list_display = ("patient", "condition", "date_diagnosed")
+    list_filter = ("date_diagnosed",)
+    search_fields = ("condition", "notes", "patient__user__username")

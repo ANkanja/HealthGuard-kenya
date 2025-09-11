@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from .models import MedicalHistory, UserProfile
 
 from .forms import UserRegisterForm, UserLoginForm
 
@@ -34,6 +35,31 @@ class UserLogoutView(LogoutView):
         return self.post(request, *args, **kwargs)
 
 
-@login_required
+
 def home_view(request):
     return render(request, 'home.html')
+
+
+
+
+def patient_dashboard(request):
+    # Get the logged-in user's profile
+    profile = request.user.profile  
+
+    # Make sure this user is a patient before showing patient dashboard
+    if profile.role != "patient":
+        # You can redirect staff/doctors to their own dashboards later
+        return render(request, "not_authorized.html")
+
+    # Fetch health data linked to this patient
+    history = MedicalHistory.objects.filter(patient=profile)
+    # prescriptions = Prescription.objects.filter(patient=profile)
+    # labs = LabResult.objects.filter(patient=profile)
+
+    return render(request, "dashboard.html", {
+        "profile": profile,
+        "history": history,
+        # "prescriptions": prescriptions,
+        # "labs": labs,
+    })
+
