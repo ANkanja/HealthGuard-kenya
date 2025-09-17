@@ -18,6 +18,9 @@
     <a href="{% url 'home' %}">Home</a>
     {% if user.is_authenticated %}
       <span>Hi, {{ user.username }} ({{ user.profile.role|default:'-' }})</span>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'redirect_to_dashboard' %}">Dashboard</a>
+      </li>
       {% if user.is_authenticated %}
         <form action="{% url 'logout' %}" method="post" style="display:inline;">
           {% csrf_token %}

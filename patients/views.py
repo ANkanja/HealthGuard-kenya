@@ -57,20 +57,8 @@ class UserLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        profile = self.request.user.profile
-
-        if profile.role == "patient":
-            return reverse('patient_dashboard')
-        elif profile.role == "clinic_staff":
-            return reverse('clinic_staff_dashboard')
-        elif profile.role == "doctor":
-            return reverse('doctor_dashboard')
-        elif profile.role == "gov_official":
-            return reverse('gov_dashboard')
-        elif profile.role == "chw":
-            return reverse('chw_dashboard')
-        else:
-            return reverse('home')
+        # Redirect everyone to home after login
+        return reverse('home')
 
 
 class UserLogoutView(LogoutView):
@@ -82,7 +70,29 @@ class UserLogoutView(LogoutView):
 
 
 def home_view(request):
-    return render(request, 'home.html')
+    # Static content for now, can later fetch from DB or API
+    context = {
+        "about": "HealthGuard Kenya is a platform designed to connect patients, doctors, clinics, and community health workers in one ecosystem for better healthcare management.",
+        "articles": [
+            {
+                "title": "How to Stay Healthy During Flu Season",
+                "excerpt": "Tips on boosting your immunity and staying safe...",
+                "link": "#"
+            },
+            {
+                "title": "Kenya’s New Digital Health Policy",
+                "excerpt": "The government is rolling out new initiatives for healthcare digitization...",
+                "link": "#"
+            },
+            {
+                "title": "Nutrition Matters: Eating Right Everyday",
+                "excerpt": "A balanced diet is your best defense against chronic illness...",
+                "link": "#"
+            },
+        ]
+    }
+    return render(request, "home.html", context)
+
 
 
 @login_required
@@ -154,3 +164,21 @@ def chw_dashboard(request):
 def not_authorized_view(request):
     # ✅ Fixed template path
     return render(request, "dashboards/not_authorized.html")
+
+
+@login_required
+def redirect_to_dashboard(request):
+    profile = request.user.profile
+
+    if profile.role == "patient":
+        return redirect('patient_dashboard')
+    elif profile.role == "clinic_staff":
+        return redirect('clinic_staff_dashboard')
+    elif profile.role == "doctor":
+        return redirect('doctor_dashboard')
+    elif profile.role == "gov_official":
+        return redirect('gov_dashboard')
+    elif profile.role == "chw":
+        return redirect('chw_dashboard')
+    else:
+        return redirect('not_authorized')

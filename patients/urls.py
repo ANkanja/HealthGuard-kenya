@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import patient_dashboard, clinic_staff_dashboard, doctor_dashboard, gov_dashboard, chw_dashboard, register_view, UserLoginView, UserLogoutView, home_view, not_authorized_view
+from .views import patient_dashboard, clinic_staff_dashboard, doctor_dashboard, gov_dashboard, chw_dashboard, register_view, UserLoginView, UserLogoutView, home_view, not_authorized_view, redirect_to_dashboard
 
 urlpatterns = [
     path('', home_view, name='home'),
@@ -16,4 +16,7 @@ urlpatterns = [
 
      # Unauthorized
     path('not_authorized/', not_authorized_view, name='not_authorized'),
+
+    # Dashboard redirect
+    path('dashboard/', redirect_to_dashboard, name='redirect_to_dashboard'),
 ]
