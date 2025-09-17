@@ -13,6 +13,14 @@ class UserProfile(models.Model):
         ('gov_official', 'Government Official'),
         ('chw', 'Community Health Worker'),
     ]
+    
+    # Add GENDER_CHOICES as a class attribute
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+        ('prefer_not_to_say', 'Prefer not to say'),
+    ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='patient')
@@ -20,9 +28,10 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
     gender = models.CharField(
-        max_length=10,
-        choices=[('male', 'Male'), ('female', 'Female')],
-        blank=True, null=True
+        max_length=20,  # Increased to accommodate longer choice values
+        choices=GENDER_CHOICES,  # Now references the class attribute
+        blank=True, 
+        null=True
     )
 
     def __str__(self):

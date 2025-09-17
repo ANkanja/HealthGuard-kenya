@@ -6,39 +6,16 @@ from .models import UserProfile
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=UserProfile.ROLE_CHOICES, initial='patient')
-    phone_number = forms.CharField(required=False)
-    location = forms.CharField(required=False)
-    age = forms.IntegerField(required=False, min_value=0)
-    gender = forms.ChoiceField(
-        choices=[('', '---------'), ('male', 'Male'), ('female', 'Female')],
-        required=False
-    )
+    phone_number = forms.CharField(max_length=15, required=True)
+    age = forms.IntegerField(required=True)
+    gender = forms.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=True)
+    location = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'role',
-                  'phone_number', 'location', 'age', 'gender']
+        fields = ['username', 'email', 'password1', 'password2',
+                  'phone_number', 'age', 'gender', 'location']
 
-    def save(self, commit=True):
-        # Create the User first
-        user = super().save(commit=commit)
-        # Ensure email saved on the User
-        user.email = self.cleaned_data['email']
-        if commit:
-            user.save()
-
-        # Create/update the linked UserProfile
-        profile, _ = UserProfile.objects.get_or_create(user=user)
-        profile.role = self.cleaned_data.get('role')
-        profile.phone_number = self.cleaned_data.get('phone_number')
-        profile.location = self.cleaned_data.get('location')
-        profile.age = self.cleaned_data.get('age')
-        profile.gender = self.cleaned_data.get('gender')
-        if commit:
-            profile.save()
-
-        return user
 
 
 class UserLoginForm(AuthenticationForm):
