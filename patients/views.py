@@ -8,8 +8,11 @@ from .models import MedicalHistory, UserProfile
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .decorators import role_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from .forms import MedicalHistoryForm
 
-from .forms import UserRegisterForm, UserLoginForm
+from .forms import MedicalHistoryForm, UserRegisterForm, UserLoginForm
 
 # Create your views here.
 
@@ -132,7 +135,7 @@ def patient_dashboard(request):
     # ✅ Added medical history like in dashboard_view
     history = MedicalHistory.objects.filter(patient=profile)
     return render(request, 'dashboards/patient_dashboard.html', {
-        "profile": profile, 
+        "profile": profile,
         "history": history
     })
 
@@ -182,3 +185,111 @@ def redirect_to_dashboard(request):
         return redirect('chw_dashboard')
     else:
         return redirect('not_authorized')
+    
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def search_patients(request):
+    query = request.GET.get('q', '')
+    results = []
+
+    if query:
+        results = UserProfile.objects.filter(
+            Q(user__username__icontains=query) |
+            Q(user__email__icontains=query) |
+            Q(phone_number__icontains=query)
+        ).filter(role='patient')
+
+    return render(request, 'medical/search_patients.html', {
+        'query': query,
+        'results': results
+    })
+
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def view_patient_history(request, patient_id):
+    patient = UserProfile.objects.get(id=patient_id, role='patient')
+    history = MedicalHistory.objects.filter(patient=patient)
+    return render(request, 'medical/view_history.html', {
+        'patient': patient,
+        'history': history
+    })
+
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def add_medical_history(request, patient_id):
+    patient = UserProfile.objects.get(id=patient_id, role='patient')
+
+    if request.method == 'POST':
+        form = MedicalHistoryForm(request.POST)
+        if form.is_valid():
+            record = form.save(commit=False)
+            record.patient = patient
+            record.created_by = request.user.profile
+            record.save()
+            messages.success(request, 'Medical record added successfully!')
+            return redirect('view_patient_history', patient_id=patient.id)
+    else:
+        form = MedicalHistoryForm()
+
+    return render(request, 'medical/add_history.html', {
+        'form': form,
+        'patient': patient
+    })
+
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def search_patients(request):
+    query = request.GET.get('q', '')
+    results = []
+
+    if query:
+        results = UserProfile.objects.filter(
+            role='patient'
+        ).filter(
+            Q(user__username__icontains=query) |
+            Q(user__email__icontains=query) |
+            Q(phone_number__icontains=query)
+        )
+
+    return render(request, "medical/search_patients.html", {
+        "query": query,
+        "results": results,
+    })
+
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def view_patient_history(request, patient_id):
+    patient = get_object_or_404(UserProfile, id=patient_id, role='patient')
+    history = MedicalHistory.objects.filter(patient=patient)
+
+    return render(request, "medical/view_history.html", {
+        "patient": patient,
+        "history": history,
+    })
+
+
+@login_required
+@role_required(['doctor', 'clinic_staff'])
+def add_medical_history(request, patient_id):
+    patient = get_object_or_404(UserProfile, id=patient_id, role='patient')
+
+    if request.method == "POST":
+        form = MedicalHistoryForm(request.POST)
+        if form.is_valid():
+            history = form.save(commit=False)
+            history.patient = patient
+            history.save()
+            messages.success(request, "Medical record added successfully.")
+            return redirect("view_patient_history", patient_id=patient.id)
+    else:
+        form = MedicalHistoryForm()
+
+    return render(request, "medical/add_history.html", {
+        "form": form,
+        "patient": patient,
+    })

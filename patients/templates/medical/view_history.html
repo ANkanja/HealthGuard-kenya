@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Medical History for {{ patient.user.username }}</h2>
+
+    {% if history %}
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Condition</th>
+                    <th>Treatment</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history %}
+                <tr>
+                    <td>{{ record.date|date:"Y-m-d" }}</td>
+                    <td>{{ record.condition }}</td>
+                    <td>{{ record.treatment }}</td>
+                    <td>{{ record.notes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">No medical history available.</p>
+    {% endif %}
+
+    <a href="{% url 'add_medical_history' patient.id %}" class="btn btn-success">Add Medical Record</a>
+</div>
+{% endblock %}

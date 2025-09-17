@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Search Patients</h2>
+    <form method="get" action="{% url 'search_patients' %}" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search by name, email, or phone..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    {% if results %}
+        <h4>Results:</h4>
+        <ul class="list-group">
+            {% for patient in results %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ patient.user.username }} ({{ patient.user.email }})
+                    <a href="{% url 'view_patient_history' patient.id %}" class="btn btn-sm btn-info">View History</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif query %}
+        <p class="text-muted">No patients found for "{{ query }}"</p>
+    {% endif %}
+</div>
+{% endblock %}

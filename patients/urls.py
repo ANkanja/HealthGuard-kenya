@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import patient_dashboard, clinic_staff_dashboard, doctor_dashboard, gov_dashboard, chw_dashboard, register_view, UserLoginView, UserLogoutView, home_view, not_authorized_view, redirect_to_dashboard
+from .views import patient_dashboard, clinic_staff_dashboard, doctor_dashboard, gov_dashboard, chw_dashboard, register_view, UserLoginView, UserLogoutView, home_view, not_authorized_view, redirect_to_dashboard, search_patients, view_patient_history, add_medical_history
 
 urlpatterns = [
     path('', home_view, name='home'),
@@ -14,9 +14,19 @@ urlpatterns = [
     path('gov_dashboard/', gov_dashboard, name='gov_dashboard'),
     path('chw_dashboard/', chw_dashboard, name='chw_dashboard'),
 
-     # Unauthorized
+    # Medical data
+    path('search_patients/', search_patients, name='search_patients'),
+    path('patient/<int:patient_id>/history/', view_patient_history, name='view_patient_history'),
+    path('patient/<int:patient_id>/add_history/', add_medical_history, name='add_medical_history'),
+
+    # Unauthorized
     path('not_authorized/', not_authorized_view, name='not_authorized'),
 
     # Dashboard redirect
     path('dashboard/', redirect_to_dashboard, name='redirect_to_dashboard'),
+
+    # Medical history features
+    path('search_patients/', search_patients, name='search_patients'),
+    path('patient/<int:patient_id>/history/', view_patient_history, name='view_patient_history'),
+    path('patient/<int:patient_id>/history/add/', add_medical_history, name='add_medical_history'),
 ]

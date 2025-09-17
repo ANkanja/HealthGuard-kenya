@@ -1,7 +1,11 @@
 {% extends "base.html" %}
-
 {% block content %}
+<div class="container mt-4">
   <h2>Doctor Dashboard</h2>
-  <p>Welcome, Dr. {{ profile.user.username }}!</p>
-  <p>Here you will see patient lists, reports, and issue prescriptions.</p>
+  <p>Welcome, {{ profile.user.username }}!</p>
+
+  <a href="{% url 'search_patients' %}" class="btn btn-primary mt-3">
+    🔍 Search Patients
+  </a>
+</div>
 {% endblock %}

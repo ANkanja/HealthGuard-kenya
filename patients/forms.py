@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, MedicalHistory
 
 
 class UserRegisterForm(UserCreationForm):
@@ -17,7 +17,16 @@ class UserRegisterForm(UserCreationForm):
                   'phone_number', 'age', 'gender', 'location']
 
 
-
 class UserLoginForm(AuthenticationForm):
     # You can customize labels/placeholders if you like
     pass
+
+
+# ✅ New form for medical history
+class MedicalHistoryForm(forms.ModelForm):
+    class Meta:
+        model = MedicalHistory
+        fields = ['condition', 'notes', 'date_diagnosed']
+        widgets = {
+            'date_diagnosed': forms.DateInput(attrs={'type': 'date'})
+        }
