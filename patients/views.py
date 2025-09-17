@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from .models import MedicalHistory, UserProfile
+from .models import MedicalHistory, UserProfile, Prescription, LabResult
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .decorators import role_required
@@ -98,7 +98,6 @@ def home_view(request):
 
 
 
-@login_required
 def dashboard_view(request):
     profile = request.user.profile
 
@@ -128,36 +127,36 @@ def dashboard_view(request):
         return render(request, "dashboards/not_authorized.html")
 
 
-@login_required
 @role_required(['patient'])
 def patient_dashboard(request):
     profile = request.user.profile
     # ✅ Added medical history like in dashboard_view
     history = MedicalHistory.objects.filter(patient=profile)
+    prescriptions = Prescription.objects.filter(patient=profile)
+    lab_results = LabResult.objects.filter(patient=profile)
+
     return render(request, 'dashboards/patient_dashboard.html', {
         "profile": profile,
-        "history": history
+        "history": history,
+        "prescriptions": prescriptions,
+        "lab_results": lab_results
     })
 
-@login_required
 @role_required(['clinic_staff'])
 def clinic_staff_dashboard(request):
     profile = request.user.profile
     return render(request, 'dashboards/clinic_staff_dashboard.html', {"profile": profile})
 
-@login_required
 @role_required(['doctor'])
 def doctor_dashboard(request):
     profile = request.user.profile
     return render(request, 'dashboards/doctor_dashboard.html', {"profile": profile})
 
-@login_required
 @role_required(['gov_official'])
 def gov_dashboard(request):
     profile = request.user.profile
     return render(request, 'dashboards/gov_dashboard.html', {"profile": profile})
 
-@login_required
 @role_required(['chw'])
 def chw_dashboard(request):
     profile = request.user.profile
@@ -169,7 +168,6 @@ def not_authorized_view(request):
     return render(request, "dashboards/not_authorized.html")
 
 
-@login_required
 def redirect_to_dashboard(request):
     profile = request.user.profile
 
@@ -187,7 +185,6 @@ def redirect_to_dashboard(request):
         return redirect('not_authorized')
     
 
-@login_required
 @role_required(['doctor', 'clinic_staff'])
 def search_patients(request):
     query = request.GET.get('q', '')
@@ -206,18 +203,21 @@ def search_patients(request):
     })
 
 
-@login_required
 @role_required(['doctor', 'clinic_staff'])
 def view_patient_history(request, patient_id):
     patient = UserProfile.objects.get(id=patient_id, role='patient')
     history = MedicalHistory.objects.filter(patient=patient)
+    prescriptions = Prescription.objects.filter(patient=patient)
+    lab_results = LabResult.objects.filter(patient=patient)
+
     return render(request, 'medical/view_history.html', {
         'patient': patient,
-        'history': history
+        'history': history,
+        'prescriptions': prescriptions,
+        'lab_results': lab_results
     })
 
 
-@login_required
 @role_required(['doctor', 'clinic_staff'])
 def add_medical_history(request, patient_id):
     patient = UserProfile.objects.get(id=patient_id, role='patient')
@@ -239,57 +239,3 @@ def add_medical_history(request, patient_id):
         'patient': patient
     })
 
-
-@login_required
-@role_required(['doctor', 'clinic_staff'])
-def search_patients(request):
-    query = request.GET.get('q', '')
-    results = []
-
-    if query:
-        results = UserProfile.objects.filter(
-            role='patient'
-        ).filter(
-            Q(user__username__icontains=query) |
-            Q(user__email__icontains=query) |
-            Q(phone_number__icontains=query)
-        )
-
-    return render(request, "medical/search_patients.html", {
-        "query": query,
-        "results": results,
-    })
-
-
-@login_required
-@role_required(['doctor', 'clinic_staff'])
-def view_patient_history(request, patient_id):
-    patient = get_object_or_404(UserProfile, id=patient_id, role='patient')
-    history = MedicalHistory.objects.filter(patient=patient)
-
-    return render(request, "medical/view_history.html", {
-        "patient": patient,
-        "history": history,
-    })
-
-
-@login_required
-@role_required(['doctor', 'clinic_staff'])
-def add_medical_history(request, patient_id):
-    patient = get_object_or_404(UserProfile, id=patient_id, role='patient')
-
-    if request.method == "POST":
-        form = MedicalHistoryForm(request.POST)
-        if form.is_valid():
-            history = form.save(commit=False)
-            history.patient = patient
-            history.save()
-            messages.success(request, "Medical record added successfully.")
-            return redirect("view_patient_history", patient_id=patient.id)
-    else:
-        form = MedicalHistoryForm()
-
-    return render(request, "medical/add_history.html", {
-        "form": form,
-        "patient": patient,
-    })

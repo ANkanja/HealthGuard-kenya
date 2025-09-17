@@ -25,7 +25,7 @@ urlpatterns = [
     # Dashboard redirect
     path('dashboard/', redirect_to_dashboard, name='redirect_to_dashboard'),
 
-    # Medical history features
+    # Medical Records features
     path('search_patients/', search_patients, name='search_patients'),
     path('patient/<int:patient_id>/history/', view_patient_history, name='view_patient_history'),
     path('patient/<int:patient_id>/history/add/', add_medical_history, name='add_medical_history'),

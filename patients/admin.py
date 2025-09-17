@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, MedicalHistory, Prescription, LabResult
 
 
 # Inline Profile for User Admin
@@ -25,3 +25,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 # Unregister the default User admin and register the new one
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(MedicalHistory)
+admin.site.register(Prescription)
+admin.site.register(LabResult)
+
