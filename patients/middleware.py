@@ -10,6 +10,7 @@ class LoginRequiredMiddleware:
 
         # Allow unauthenticated users to access only login, signup, logout and admin
         if not request.user.is_authenticated and not (
+            path.startswith(reverse('home')) or
             path.startswith(reverse('login')) or
             path.startswith(reverse('register')) or
             path.startswith(reverse('logout')) or

@@ -57,7 +57,8 @@ class MedicalHistory(models.Model):
     patient = models.ForeignKey(UserProfile, on_delete=models.CASCADE, limit_choices_to={'role': 'patient'})
     condition = models.CharField(max_length=200)
     notes = models.TextField(blank=True, null=True)
-    date_diagnosed = models.DateField()
+    date = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"{self.patient.user.username} - {self.condition}"

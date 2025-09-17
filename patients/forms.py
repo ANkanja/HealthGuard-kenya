@@ -26,7 +26,4 @@ class UserLoginForm(AuthenticationForm):
 class MedicalHistoryForm(forms.ModelForm):
     class Meta:
         model = MedicalHistory
-        fields = ['condition', 'notes', 'date_diagnosed']
-        widgets = {
-            'date_diagnosed': forms.DateInput(attrs={'type': 'date'})
-        }
+        fields = ['condition', 'notes']
