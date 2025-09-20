@@ -64,25 +64,8 @@ class MedicalHistory(models.Model):
         return f"{self.patient.user.username} - {self.condition}"
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Prescription(models.Model):
-    patient = models.ForeignKey(
-        UserProfile, 
-        on_delete=models.CASCADE, 
-        limit_choices_to={'role': 'patient'}
-    )
+    patient = models.ForeignKey(UserProfile, on_delete=models.CASCADE, limit_choices_to={'role': 'patient'})
     medication = models.CharField(max_length=200)
     dosage = models.CharField(max_length=100)
     start_date = models.DateField()
